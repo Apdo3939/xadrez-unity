@@ -510,6 +510,7 @@ GameObject:
   m_Component:
   - component: {fileID: 422374564}
   - component: {fileID: 422374563}
+  - component: {fileID: 422374565}
   m_Layer: 0
   m_Name: ChessBoard
   m_TagString: Untagged
@@ -582,6 +583,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &422374565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422374562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3646adcc77ee704f9ebcd7370286d80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -2010,7 +2023,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4039564202605608833, guid: e8f1ee54712ebab4e8a725312bded05e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4039564202605608833, guid: e8f1ee54712ebab4e8a725312bded05e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2134,7 +2147,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 36857678375691057, guid: 1425d7b78375bfc43ad631ffbe306c66, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 36857678375691057, guid: 1425d7b78375bfc43ad631ffbe306c66, type: 3}
       propertyPath: m_LocalPosition.y
