@@ -10,7 +10,8 @@ public class LoadState : State
         Debug.Log("Entrou no estado");
         await Board.instance.Load();
         await LoadAllPiecesAsync();
-        //machine.ChangeTo<BeginState>();
+        machine.currentlyPlaying = machine.player2;
+        machine.ChangeTo<TurnBeginState>();
     }
 
     async Task LoadAllPiecesAsync()
