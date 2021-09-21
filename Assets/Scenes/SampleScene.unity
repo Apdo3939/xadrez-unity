@@ -595,6 +595,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3646adcc77ee704f9ebcd7370286d80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  goldHolder: {fileID: 2077349202}
+  greenHolder: {fileID: 1288870116}
   goldPieces: []
   greenPieces: []
 --- !u!1 &519420028

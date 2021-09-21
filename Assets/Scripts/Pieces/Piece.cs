@@ -9,9 +9,4 @@ public abstract class Piece : MonoBehaviour
     {
         Debug.Log("Clik na piece " + transform);
     }
-
-    void Start()
-    {
-        Board.instance.AddPiece(transform.parent.name, this);
-    }
 }
