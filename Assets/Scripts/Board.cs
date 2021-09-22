@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
+public delegate void TileClickedEvent(object sender, object args);
+
 public class Board : MonoBehaviour
 {
     public static Board instance;
@@ -11,6 +13,8 @@ public class Board : MonoBehaviour
     public Transform greenHolder { get { return StateMachineController.instance.player2.transform; } }
     public List<Piece> goldPieces = new List<Piece>();
     public List<Piece> greenPieces = new List<Piece>();
+    public TileClickedEvent tileClicked = delegate { };
+    public Piece selectedPiece;
 
     void Awake()
     {

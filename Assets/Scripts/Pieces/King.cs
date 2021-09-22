@@ -4,5 +4,8 @@ using UnityEngine;
 
 public class King : Piece
 {
-
+    private void Awake()
+    {
+        moviment = new KingMoviment();
+    }
 }

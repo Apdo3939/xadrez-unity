@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public abstract class Moviment
 {
-    public Color color;
+    public abstract List<Tile> GetValidMoves();
 }

@@ -4,9 +4,11 @@ using UnityEngine;
 
 public abstract class Piece : MonoBehaviour
 {
+    [HideInInspector]
+    public Moviment moviment;
     public Tile tile = new Tile();
     void OnMouseDown()
     {
-        Debug.Log("Clik na piece " + transform);
+        Board.instance.tileClicked(this, transform.parent.GetComponent<Player>());
     }
 }
