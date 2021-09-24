@@ -9,7 +9,10 @@ public class PawnMoviment : Moviment
         List<Vector2Int> temp = new List<Vector2Int>();
         Vector2Int direction = GetDirection();
         temp.Add(Board.instance.selectedPiece.tile.pos + direction);
-        return ValidationExists(temp);
+        List<Tile> exists = ValidationExists(temp);
+        List<Tile> moveable = UntilBlockedPath(exists);
+        moveable.AddRange(GetPawnAttack(direction));
+        return moveable;
     }
 
     Vector2Int GetDirection()
@@ -46,5 +49,41 @@ public class PawnMoviment : Moviment
             }
         }
         return valid;
+    }
+
+    bool IsEnemy(Vector2Int pos, out Tile temp)
+    {
+        if (Board.instance.tiles.TryGetValue(pos, out temp))
+        {
+            if (temp != null && temp.content != null)
+            {
+                if (temp.content.transform.parent != Board.instance.selectedPiece.transform.parent)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    List<Tile> GetPawnAttack(Vector2Int direction)
+    {
+        List<Tile> pawnAttack = new List<Tile>();
+        Tile temp;
+        Piece piece = Board.instance.selectedPiece;
+        Vector2Int leftPos = new Vector2Int(piece.tile.pos.x - 1, piece.tile.pos.y + direction.y);
+        Vector2Int rightPos = new Vector2Int(piece.tile.pos.x + 1, piece.tile.pos.y + direction.y);
+
+        if (IsEnemy(leftPos, out temp))
+        {
+            pawnAttack.Add(temp);
+        }
+
+        if (IsEnemy(rightPos, out temp))
+        {
+            pawnAttack.Add(temp);
+        }
+
+        return pawnAttack;
     }
 }
