@@ -15,6 +15,7 @@ public class Board : MonoBehaviour
     public List<Piece> greenPieces = new List<Piece>();
     public TileClickedEvent tileClicked = delegate { };
     public Piece selectedPiece;
+    public HighlightsClick selectedHighlight;
 
     void Awake()
     {
