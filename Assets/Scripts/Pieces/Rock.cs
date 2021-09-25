@@ -4,5 +4,8 @@ using UnityEngine;
 
 public class Rock : Piece
 {
-
+    private void Awake()
+    {
+        moviment = new RockMovement();
+    }
 }

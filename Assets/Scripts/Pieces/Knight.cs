@@ -4,5 +4,8 @@ using UnityEngine;
 
 public class Knight : Piece
 {
-
+    private void Awake()
+    {
+        moviment = new KnightMovement();
+    }
 }

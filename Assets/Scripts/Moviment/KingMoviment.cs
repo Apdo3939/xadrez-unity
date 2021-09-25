@@ -6,6 +6,20 @@ public class KingMoviment : Moviment
 {
     public override List<Tile> GetValidMoves()
     {
-        return null;
+        List<Tile> moves = new List<Tile>();
+
+        moves.AddRange(UntilBlockedPath(new Vector2Int(1, 0), true, 1));
+        moves.AddRange(UntilBlockedPath(new Vector2Int(-1, 0), true, 1));
+
+        moves.AddRange(UntilBlockedPath(new Vector2Int(0, 1), true, 1));
+        moves.AddRange(UntilBlockedPath(new Vector2Int(0, -1), true, 1));
+
+        moves.AddRange(UntilBlockedPath(new Vector2Int(1, 1), true, 1));
+        moves.AddRange(UntilBlockedPath(new Vector2Int(-1, -1), true, 1));
+
+        moves.AddRange(UntilBlockedPath(new Vector2Int(-1, 1), true, 1));
+        moves.AddRange(UntilBlockedPath(new Vector2Int(1, -1), true, 1));
+
+        return moves;
     }
 }
