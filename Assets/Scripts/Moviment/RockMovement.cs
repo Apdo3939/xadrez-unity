@@ -6,6 +6,16 @@ public class RockMovement : Moviment
 {
     public override List<Tile> GetValidMoves()
     {
-        return null;
+        List<Tile> moves = new List<Tile>();
+
+        int limit = 99;
+
+        moves.AddRange(UntilBlockedPath(new Vector2Int(1, 0), true, limit));
+        moves.AddRange(UntilBlockedPath(new Vector2Int(-1, 0), true, limit));
+
+        moves.AddRange(UntilBlockedPath(new Vector2Int(0, 1), true, limit));
+        moves.AddRange(UntilBlockedPath(new Vector2Int(0, -1), true, limit));
+
+        return moves;
     }
 }
