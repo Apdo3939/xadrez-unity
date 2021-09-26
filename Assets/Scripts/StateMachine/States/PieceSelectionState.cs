@@ -7,12 +7,12 @@ public class PieceSelectionState : State
 {
     public override void Enter()
     {
-        Board.instance.tileClicked += PieceClicked;
+        InputController.instance.tileClicked += PieceClicked;
     }
 
     public override void Exit()
     {
-        Board.instance.tileClicked -= PieceClicked;
+        InputController.instance.tileClicked -= PieceClicked;
     }
 
     void PieceClicked(object sender, object args)

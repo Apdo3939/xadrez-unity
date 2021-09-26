@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public delegate void TileClickedEvent(object sender, object args);
+
 
 public class Board : MonoBehaviour
 {
@@ -13,7 +13,6 @@ public class Board : MonoBehaviour
     public Transform greenHolder { get { return StateMachineController.instance.player2.transform; } }
     public List<Piece> goldPieces = new List<Piece>();
     public List<Piece> greenPieces = new List<Piece>();
-    public TileClickedEvent tileClicked = delegate { };
     public Piece selectedPiece;
     public HighlightsClick selectedHighlight;
 
@@ -58,5 +57,33 @@ public class Board : MonoBehaviour
         Tile tile = new Tile();
         tile.pos = new Vector2Int(i, j);
         tiles.Add(tile.pos, tile);
+    }
+
+    [ContextMenu("Reset board")]
+    public void ResetBoard()
+    {
+        foreach (Tile t in tiles.Values)
+        {
+            t.content = null;
+        }
+        foreach (Piece p in goldPieces)
+        {
+            ResetPiece(p);
+        }
+        foreach (Piece p in greenPieces)
+        {
+            ResetPiece(p);
+        }
+    }
+
+    void ResetPiece(Piece p)
+    {
+        if (!p.gameObject.activeSelf)
+        {
+            return;
+        }
+        Vector2Int pos = new Vector2Int((int)p.transform.position.x, (int)p.transform.position.y);
+        tiles.TryGetValue(pos, out p.tile);
+        p.tile.content = p;
     }
 }

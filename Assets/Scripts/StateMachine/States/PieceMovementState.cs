@@ -8,6 +8,35 @@ public class PieceMovementState : State
     public override async void Enter()
     {
         Debug.Log("Piece Moved...");
+
+        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+        switch (Board.instance.selectedHighlight.tile.moveType)
+        {
+            case MoveType.Normal:
+                NormalMove(tcs);
+                break;
+            case MoveType.Castling:
+                Castling(tcs);
+                break;
+            case MoveType.EnPassant:
+                break;
+            case MoveType.Promotion:
+                break;
+            default:
+                break;
+        }
+
+        await tcs.Task;
+        machine.ChangeTo<TurnEndState>();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+    }
+
+    void NormalMove(TaskCompletionSource<bool> tcs)
+    {
         Piece piece = Board.instance.selectedPiece;
         //piece.transform.position = Board.instance.selectedHighlight.transform.position;
         piece.tile.content = null;
@@ -23,19 +52,44 @@ public class PieceMovementState : State
         piece.tile.content = piece;
         piece.wasMoved = true;
 
-        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
         float timing = Vector3.Distance(piece.transform.position, Board.instance.selectedHighlight.transform.position) * 0.5f;
         LeanTween.move(piece.gameObject, Board.instance.selectedHighlight.transform.position, timing).setOnComplete(() =>
         {
             tcs.SetResult(true);
         });
-
-        await tcs.Task;
-        machine.ChangeTo<TurnEndState>();
     }
 
-    public override void Exit()
+    void Castling(TaskCompletionSource<bool> tcs)
     {
-        base.Exit();
+        Piece king = Board.instance.selectedPiece;
+        king.tile.content = null;
+        Piece rock = Board.instance.selectedHighlight.tile.content;
+        rock.tile.content = null;
+
+        Vector2Int direction = rock.tile.pos - king.tile.pos;
+
+        if (direction.x > 0)
+        {
+            king.tile = Board.instance.tiles[new Vector2Int(king.tile.pos.x + 2, king.tile.pos.y)];
+            rock.tile = Board.instance.tiles[new Vector2Int(king.tile.pos.x - 1, king.tile.pos.y)];
+        }
+        else
+        {
+            king.tile = Board.instance.tiles[new Vector2Int(king.tile.pos.x - 2, king.tile.pos.y)];
+            rock.tile = Board.instance.tiles[new Vector2Int(king.tile.pos.x + 1, king.tile.pos.y)];
+        }
+
+        king.tile.content = king;
+        rock.tile.content = rock;
+        king.wasMoved = true;
+        rock.wasMoved = true;
+
+        float timingKing = Vector3.Distance(king.transform.position, Board.instance.selectedHighlight.transform.position) * 0.5f;
+        LeanTween.move(king.gameObject, new Vector3(king.tile.pos.x, king.tile.pos.y, 0), timingKing).setOnComplete(() =>
+       {
+           tcs.SetResult(true);
+       });
+
+        LeanTween.move(rock.gameObject, new Vector3(rock.tile.pos.x, rock.tile.pos.y, 0), timingKing - 0.1f);
     }
 }

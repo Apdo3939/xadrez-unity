@@ -8,7 +8,7 @@ public class TurnEndState : State
     public override async void Enter()
     {
         Debug.Log("Turn End");
-        bool gameFinished = CheckTeams();
+        bool gameFinished = CheckConditions();
         await Task.Delay(100);
         if (gameFinished)
         {
@@ -18,6 +18,32 @@ public class TurnEndState : State
         {
             machine.ChangeTo<TurnBeginState>();
         }
+    }
+
+    bool CheckConditions()
+    {
+        if (CheckKing() || CheckTeams())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    bool CheckKing()
+    {
+        King king = Board.instance.goldHolder.GetComponentInChildren<King>();
+        if (king == null)
+        {
+            Debug.Log("Green Win!!!!");
+            return true;
+        }
+        king = Board.instance.greenHolder.GetComponentInChildren<King>();
+        if (king == null)
+        {
+            Debug.Log("Gold Win!!!!");
+            return true;
+        }
+        return false;
     }
 
 

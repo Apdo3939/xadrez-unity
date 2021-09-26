@@ -14,6 +14,7 @@ public class PawnMoviment : Moviment
         }
         List<Tile> moveable = UntilBlockedPath(direction, false, limit);
         moveable.AddRange(GetPawnAttack(direction));
+        SetNormalMove(moveable);
         return moveable;
     }
 

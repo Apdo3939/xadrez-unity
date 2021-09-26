@@ -21,7 +21,7 @@ public class QueenMovement : Moviment
 
         moves.AddRange(UntilBlockedPath(new Vector2Int(-1, 1), true, limit));
         moves.AddRange(UntilBlockedPath(new Vector2Int(1, -1), true, limit));
-
+        SetNormalMove(moves);
         return moves;
     }
 }

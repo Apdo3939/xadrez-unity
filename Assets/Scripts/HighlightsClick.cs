@@ -8,6 +8,6 @@ public class HighlightsClick : MonoBehaviour
 
     void OnMouseDown()
     {
-        Board.instance.tileClicked(this, null);
+        InputController.instance.tileClicked(this, null);
     }
 }

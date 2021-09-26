@@ -15,7 +15,7 @@ public class RockMovement : Moviment
 
         moves.AddRange(UntilBlockedPath(new Vector2Int(0, 1), true, limit));
         moves.AddRange(UntilBlockedPath(new Vector2Int(0, -1), true, limit));
-
+        SetNormalMove(moves);
         return moves;
     }
 }

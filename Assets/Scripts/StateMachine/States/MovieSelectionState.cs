@@ -9,13 +9,15 @@ public class MovieSelectionState : State
         Debug.Log("Select piece clicked moved...");
         List<Tile> moves = Board.instance.selectedPiece.moviment.GetValidMoves();
         Highlights.instance.SelectTiles(moves);
-        Board.instance.tileClicked += OnHighLightClicked;
+        InputController.instance.tileClicked += OnHighLightClicked;
+        InputController.instance.returnClicked += OnReturnClicked;
     }
 
     public override void Exit()
     {
         Highlights.instance.DeSelectTiles();
-        Board.instance.tileClicked -= OnHighLightClicked;
+        InputController.instance.tileClicked -= OnHighLightClicked;
+        InputController.instance.returnClicked -= OnReturnClicked;
     }
 
     void OnHighLightClicked(object sender, object args)
@@ -34,5 +36,10 @@ public class MovieSelectionState : State
         machine.ChangeTo<PieceMovementState>();//change the next state
 
 
+    }
+
+    void OnReturnClicked(object sender, object args)
+    {
+        machine.ChangeTo<PieceSelectionState>();
     }
 }
