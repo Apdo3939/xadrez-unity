@@ -8,9 +8,11 @@ public class PieceMovementState : State
     public override async void Enter()
     {
         Debug.Log("Piece Moved...");
+        MoveType moveType = Board.instance.selectedHighlight.tile.moveType;
+        ClearEnPassants();
 
         TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-        switch (Board.instance.selectedHighlight.tile.moveType)
+        switch (moveType)
         {
             case MoveType.Normal:
                 NormalMove(tcs);
@@ -19,8 +21,12 @@ public class PieceMovementState : State
                 Castling(tcs);
                 break;
             case MoveType.EnPassant:
+                EnPassant(tcs);
                 break;
             case MoveType.Promotion:
+                break;
+            case MoveType.PawnDoubleMove:
+                PawnDoubleMove(tcs);
                 break;
             default:
                 break;
@@ -91,5 +97,41 @@ public class PieceMovementState : State
        });
 
         LeanTween.move(rock.gameObject, new Vector3(rock.tile.pos.x, rock.tile.pos.y, 0), timingKing - 0.1f);
+    }
+
+    void ClearEnPassants()
+    {
+        ClearEnPassants(5);
+        ClearEnPassants(2);
+    }
+
+    void ClearEnPassants(int height)
+    {
+        Vector2Int positions = new Vector2Int(0, height);
+        for (int i = 0; i < 7; i++)
+        {
+            positions.x = positions.x + 1;
+            Board.instance.tiles[positions].moveType = MoveType.Normal;
+
+        }
+    }
+
+    void PawnDoubleMove(TaskCompletionSource<bool> tcs)
+    {
+        Piece pawn = Board.instance.selectedPiece;
+        Vector2Int direction = pawn.tile.pos.y > Board.instance.selectedHighlight.tile.pos.y ? new Vector2Int(0, -1) :
+        new Vector2Int(0, 1);
+        Board.instance.tiles[pawn.tile.pos + direction].moveType = MoveType.EnPassant;
+        NormalMove(tcs);
+    }
+    void EnPassant(TaskCompletionSource<bool> tcs)
+    {
+        Piece pawn = Board.instance.selectedPiece;
+        Vector2Int direction = pawn.tile.pos.y > Board.instance.selectedHighlight.tile.pos.y ? new Vector2Int(0, 1) :
+        new Vector2Int(0, -1);
+        Tile enemy = Board.instance.tiles[Board.instance.selectedHighlight.tile.pos + direction];
+        enemy.content.gameObject.SetActive(false);
+        enemy.content = null;
+        NormalMove(tcs);
     }
 }

@@ -8,4 +8,5 @@ public enum MoveType
     Castling,
     EnPassant,
     Promotion,
+    PawnDoubleMove,
 }
