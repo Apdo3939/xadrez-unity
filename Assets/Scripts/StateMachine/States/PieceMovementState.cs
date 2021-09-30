@@ -20,15 +20,14 @@ public class PieceMovementState : State
             case MoveType.Castling:
                 Castling(tcs);
                 break;
+            case MoveType.PawnDoubleMove:
+                PawnDoubleMove(tcs);
+                break;
             case MoveType.EnPassant:
                 EnPassant(tcs);
                 break;
             case MoveType.Promotion:
-                break;
-            case MoveType.PawnDoubleMove:
-                PawnDoubleMove(tcs);
-                break;
-            default:
+                Promotion(tcs);
                 break;
         }
 
@@ -133,5 +132,32 @@ public class PieceMovementState : State
         enemy.content.gameObject.SetActive(false);
         enemy.content = null;
         NormalMove(tcs);
+    }
+
+    async void Promotion(TaskCompletionSource<bool> tcs)
+    {
+        TaskCompletionSource<bool> movementTcs = new TaskCompletionSource<bool>();
+        NormalMove(movementTcs);
+        await movementTcs.Task;
+        Debug.Log("Promotion");
+
+        StateMachineController.instance.taskHold = new TaskCompletionSource<object>();
+        StateMachineController.instance.promotionPanel.SetActive(true);
+
+        await StateMachineController.instance.taskHold.Task;
+
+        string result = StateMachineController.instance.taskHold.Task.Result as string;
+
+        if (result == "Knight")
+        {
+            Board.instance.selectedPiece.moviment = new KnightMovement();
+        }
+        else
+        {
+            Board.instance.selectedPiece.moviment = new QueenMovement();
+        }
+        StateMachineController.instance.promotionPanel.SetActive(false);
+        tcs.SetResult(true);
+
     }
 }

@@ -9,6 +9,7 @@ public class PawnMoviment : Moviment
         Vector2Int direction = GetDirection();
         List<Tile> moveable = GetPawnAttack(direction);
         List<Tile> moves;
+
         if (!Board.instance.selectedPiece.wasMoved)
         {
             moves = UntilBlockedPath(direction, false, 2);
@@ -23,7 +24,10 @@ public class PawnMoviment : Moviment
             moves = UntilBlockedPath(direction, false, 1);
             SetNormalMove(moves);
         }
+
         moveable.AddRange(moves);
+
+        CheckPromotion(moves);
 
         return moveable;
     }
@@ -65,6 +69,18 @@ public class PawnMoviment : Moviment
         else if (tile.moveType == MoveType.EnPassant)
         {
             pawnAttack.Add(tile);
+        }
+    }
+
+    void CheckPromotion(List<Tile> tiles)
+    {
+        foreach (Tile t in tiles)
+        {
+            if (t.pos.y == 0 || t.pos.y == 7)
+            {
+                t.moveType = MoveType.Promotion;
+                Debug.Log("Promotion");
+            }
         }
     }
 }

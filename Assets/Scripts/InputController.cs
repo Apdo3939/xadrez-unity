@@ -8,6 +8,7 @@ public class InputController : MonoBehaviour
     public static InputController instance;
     public TileClickedEvent tileClicked = delegate { };
     public TileClickedEvent returnClicked = delegate { };
+
     void Awake()
     {
         instance = this;
@@ -18,5 +19,10 @@ public class InputController : MonoBehaviour
         {
             returnClicked(null, null);
         }
+    }
+
+    public void Promotion(string piece)
+    {
+        StateMachineController.instance.taskHold.SetResult(piece);
     }
 }

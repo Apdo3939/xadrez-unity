@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,8 @@ public class StateMachineController : MonoBehaviour
     public Player player1;
     public Player player2;
     public Player currentlyPlaying;
+    public TaskCompletionSource<object> taskHold;
+    public GameObject promotionPanel;
     State _current;
     bool busy;
 
