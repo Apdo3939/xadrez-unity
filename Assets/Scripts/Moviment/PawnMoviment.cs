@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class PawnMoviment : Moviment
 {
+    public PawnMoviment()
+    {
+        value = 1;
+    }
     public override List<Tile> GetValidMoves()
     {
         Vector2Int direction = GetDirection();

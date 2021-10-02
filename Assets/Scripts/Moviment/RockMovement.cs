@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class RockMovement : Moviment
 {
+    public RockMovement()
+    {
+        value = 5;
+    }
     public override List<Tile> GetValidMoves()
     {
         List<Tile> moves = new List<Tile>();

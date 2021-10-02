@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class BishopMovement : Moviment
 {
+    public BishopMovement()
+    {
+        value = 3;
+    }
     public override List<Tile> GetValidMoves()
     {
         List<Tile> moves = new List<Tile>();

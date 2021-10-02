@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class KingMoviment : Moviment
 {
+    public KingMoviment()
+    {
+        value = 100;
+    }
     public override List<Tile> GetValidMoves()
     {
         List<Tile> moves = new List<Tile>();
