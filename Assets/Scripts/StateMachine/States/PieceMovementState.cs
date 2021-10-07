@@ -5,31 +5,13 @@ using UnityEngine;
 
 public class PieceMovementState : State
 {
+    public static List<AffectedPiece> changes;
     public override async void Enter()
     {
         Debug.Log("Piece Moved...");
-        MoveType moveType = Board.instance.selectedHighlight.tile.moveType;
-        ClearEnPassants();
-
         TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-        switch (moveType)
-        {
-            case MoveType.Normal:
-                NormalMove(tcs);
-                break;
-            case MoveType.Castling:
-                Castling(tcs);
-                break;
-            case MoveType.PawnDoubleMove:
-                PawnDoubleMove(tcs);
-                break;
-            case MoveType.EnPassant:
-                EnPassant(tcs);
-                break;
-            case MoveType.Promotion:
-                Promotion(tcs);
-                break;
-        }
+
+        MovePiece(tcs, false);
 
         await tcs.Task;
         machine.ChangeTo<TurnEndState>();
@@ -40,31 +22,76 @@ public class PieceMovementState : State
         base.Exit();
     }
 
-    void NormalMove(TaskCompletionSource<bool> tcs)
+    public static void MovePiece(TaskCompletionSource<bool> tcs, bool skipMovements)
+    {
+        changes = new List<AffectedPiece>();
+        MoveType moveType = Board.instance.selectedHighlight.tile.moveType;
+        ClearEnPassants();
+
+        switch (moveType)
+        {
+            case MoveType.Normal:
+                NormalMove(tcs, skipMovements);
+                break;
+            case MoveType.Castling:
+                Castling(tcs, skipMovements);
+                break;
+            case MoveType.PawnDoubleMove:
+                PawnDoubleMove(tcs, skipMovements);
+                break;
+            case MoveType.EnPassant:
+                EnPassant(tcs, skipMovements);
+                break;
+            case MoveType.Promotion:
+                Promotion(tcs, skipMovements);
+                break;
+        }
+    }
+
+    static void NormalMove(TaskCompletionSource<bool> tcs, bool skipMovements)
     {
         Piece piece = Board.instance.selectedPiece;
-        //piece.transform.position = Board.instance.selectedHighlight.transform.position;
+
+        AffectedPiece pieceMoving = new AffectedPiece();
+        pieceMoving.piece = piece;
+        pieceMoving.from = piece.tile;
+        changes.Add(pieceMoving);
+
         piece.tile.content = null;
         piece.tile = Board.instance.selectedHighlight.tile;
 
         if (piece.tile.content != null)
         {
             Piece deadPiece = piece.tile.content;
-            Debug.Log("Piece {0}... removida", deadPiece.transform);
+
+            AffectedPiece pieceKilled = new AffectedPiece();
+            pieceKilled.piece = deadPiece;
+            pieceKilled.from = piece.tile;
+            changes.Add(pieceKilled);
+
+            //Debug.Log("Piece {0}... removida", deadPiece.transform);
             deadPiece.gameObject.SetActive(false);
         }
 
         piece.tile.content = piece;
         piece.wasMoved = true;
 
-        float timing = Vector3.Distance(piece.transform.position, Board.instance.selectedHighlight.transform.position) * 0.5f;
-        LeanTween.move(piece.gameObject, Board.instance.selectedHighlight.transform.position, timing).setOnComplete(() =>
+        if (skipMovements)
         {
+            piece.transform.position = Board.instance.selectedHighlight.transform.position;
             tcs.SetResult(true);
-        });
+        }
+        else
+        {
+            float timing = Vector3.Distance(piece.transform.position, Board.instance.selectedHighlight.transform.position) * 0.5f;
+            LeanTween.move(piece.gameObject, Board.instance.selectedHighlight.transform.position, timing).setOnComplete(() =>
+            {
+                tcs.SetResult(true);
+            });
+        }
     }
 
-    void Castling(TaskCompletionSource<bool> tcs)
+    static void Castling(TaskCompletionSource<bool> tcs, bool skipMovements)
     {
         Piece king = Board.instance.selectedPiece;
         king.tile.content = null;
@@ -98,13 +125,13 @@ public class PieceMovementState : State
         LeanTween.move(rock.gameObject, new Vector3(rock.tile.pos.x, rock.tile.pos.y, 0), timingKing - 0.1f);
     }
 
-    void ClearEnPassants()
+    static void ClearEnPassants()
     {
         ClearEnPassants(5);
         ClearEnPassants(2);
     }
 
-    void ClearEnPassants(int height)
+    static void ClearEnPassants(int height)
     {
         Vector2Int positions = new Vector2Int(0, height);
         for (int i = 0; i < 7; i++)
@@ -115,15 +142,15 @@ public class PieceMovementState : State
         }
     }
 
-    void PawnDoubleMove(TaskCompletionSource<bool> tcs)
+    static void PawnDoubleMove(TaskCompletionSource<bool> tcs, bool skipMovements)
     {
         Piece pawn = Board.instance.selectedPiece;
         Vector2Int direction = pawn.tile.pos.y > Board.instance.selectedHighlight.tile.pos.y ? new Vector2Int(0, -1) :
         new Vector2Int(0, 1);
         Board.instance.tiles[pawn.tile.pos + direction].moveType = MoveType.EnPassant;
-        NormalMove(tcs);
+        NormalMove(tcs, skipMovements);
     }
-    void EnPassant(TaskCompletionSource<bool> tcs)
+    static void EnPassant(TaskCompletionSource<bool> tcs, bool skipMovements)
     {
         Piece pawn = Board.instance.selectedPiece;
         Vector2Int direction = pawn.tile.pos.y > Board.instance.selectedHighlight.tile.pos.y ? new Vector2Int(0, 1) :
@@ -131,13 +158,13 @@ public class PieceMovementState : State
         Tile enemy = Board.instance.tiles[Board.instance.selectedHighlight.tile.pos + direction];
         enemy.content.gameObject.SetActive(false);
         enemy.content = null;
-        NormalMove(tcs);
+        NormalMove(tcs, skipMovements);
     }
 
-    async void Promotion(TaskCompletionSource<bool> tcs)
+    static async void Promotion(TaskCompletionSource<bool> tcs, bool skipMovements)
     {
         TaskCompletionSource<bool> movementTcs = new TaskCompletionSource<bool>();
-        NormalMove(movementTcs);
+        NormalMove(movementTcs, skipMovements);
         await movementTcs.Task;
         Debug.Log("Promotion");
 
