@@ -8,6 +8,9 @@ public class AIController : MonoBehaviour
     public static AIController instance;
     public Ply currentState;
     public HighlightsClick AIhighlight;
+    public Ply minPly;
+    public Ply maxPly;
+    public int objectivePlyDepth = 2;
 
     void Awake()
     {
@@ -23,9 +26,34 @@ public class AIController : MonoBehaviour
 
         Ply currentPly = currentState;
         currentPly.originPly = null;
-        currentPly.futurePlies = new List<Ply>();
-        Debug.Log("start");
-        foreach (PieceEvaluation eva in currentPly.golds)
+        //currentPly.futurePlies = new List<Ply>();
+        //minPly = maxPly = currentPly;
+        //Debug.Log("start");
+        int currentPlyDepth = 1;
+        maxPly = new Ply();
+        maxPly.score = float.MinValue;
+        minPly = new Ply();
+        minPly.score = float.MaxValue;
+
+        CalculatePly(currentPly, currentPly.golds, currentPlyDepth);
+
+        currentPlyDepth++;
+        foreach (Ply plyToTest in currentPly.futurePlies)
+        {
+            CalculatePly(plyToTest, plyToTest.greens, currentPlyDepth);
+        }
+
+        Debug.Log("Best choose for goldens: " + maxPly.name);
+
+        /*Debug.Log(currentPly.futurePlies.Count);
+        currentPly.futurePlies.Sort((x, y) => x.score.CompareTo(y.score));
+        Debug.Log("Would choose: " + currentPly.futurePlies[currentPly.futurePlies.Count - 1].name);*/
+    }
+
+    async void CalculatePly(Ply parentPly, List<PieceEvaluation> team, int currentPlyDepth)
+    {
+        parentPly.futurePlies = new List<Ply>();
+        foreach (PieceEvaluation eva in team)
         {
             Debug.Log("Analisando eva de " + eva.piece);
             foreach (Tile t in eva.availableMoves)
@@ -39,17 +67,34 @@ public class AIController : MonoBehaviour
                 PieceMovementState.MovePiece(tcs, true);
                 await tcs.Task;
                 Ply newPly = CreateSnapShot();
-                newPly.name = string.Format("{0}, {1} to {2}", currentPly.name, eva.piece, t.pos);
+                newPly.name = string.Format("{0}, {1} to {2}", parentPly.name, eva.piece.transform.parent.name + eva.piece.name, t.pos);
                 newPly.changes = PieceMovementState.changes;
                 Debug.Log(newPly.name);
                 EvaluateBoard(newPly);
                 newPly.moveType = t.moveType;
-                currentPly.futurePlies.Add(newPly);
+                newPly.originPly = parentPly;
+                parentPly.futurePlies.Add(newPly);
                 ResetBoard(newPly);
             }
-            Debug.Log(currentPly.futurePlies.Count);
-            currentPly.futurePlies.Sort((x, y) => x.score.CompareTo(y.score));
-            Debug.Log("Would choose: " + currentPly.futurePlies[0].name);
+        }
+        if (currentPlyDepth == objectivePlyDepth)
+        {
+            SetMinMax(parentPly.futurePlies);
+        }
+    }
+
+    void SetMinMax(List<Ply> plies)
+    {
+        foreach (Ply p in plies)
+        {
+            if (maxPly == null || p.score > maxPly.score)
+            {
+                maxPly = p;
+            }
+            else if (minPly == null || p.score < minPly.score)
+            {
+                minPly = p;
+            }
         }
     }
 

@@ -38,8 +38,9 @@ public class PawnMoviment : Moviment
 
     Vector2Int GetDirection()
     {
-        if (StateMachineController.instance.currentlyPlaying.transform.name == "GreenPieces")
+        if (Board.instance.selectedPiece.transform.parent.name == "GreenPieces")
         {
+            //StateMachineController.instance.currentlyPlaying.transform.name
             return new Vector2Int(0, -1);
         }
         return new Vector2Int(0, 1);

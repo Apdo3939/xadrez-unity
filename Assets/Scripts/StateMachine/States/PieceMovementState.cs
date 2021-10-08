@@ -83,6 +83,7 @@ public class PieceMovementState : State
         }
         else
         {
+            piece.wasMoved = true; //add for IA
             float timing = Vector3.Distance(piece.transform.position, Board.instance.selectedHighlight.transform.position) * 0.5f;
             LeanTween.move(piece.gameObject, Board.instance.selectedHighlight.transform.position, timing).setOnComplete(() =>
             {
