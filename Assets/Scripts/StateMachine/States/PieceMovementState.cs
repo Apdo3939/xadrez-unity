@@ -74,10 +74,11 @@ public class PieceMovementState : State
         }
 
         piece.tile.content = piece;
-        piece.wasMoved = true;
+
 
         if (skipMovements)
         {
+            piece.wasMoved = true;
             piece.transform.position = Board.instance.selectedHighlight.transform.position;
             tcs.SetResult(true);
         }

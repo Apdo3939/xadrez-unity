@@ -11,5 +11,6 @@ public class Ply
     public List<AffectedPiece> changes;
     public MoveType moveType;
     public Ply originPly;
+    public Ply bestFuture;
     public List<Ply> futurePlies;
 }
