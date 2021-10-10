@@ -6,7 +6,7 @@ public class KingMoviment : Moviment
 {
     public KingMoviment()
     {
-        value = 100;
+        value = 10000;
     }
     public override List<Tile> GetValidMoves()
     {

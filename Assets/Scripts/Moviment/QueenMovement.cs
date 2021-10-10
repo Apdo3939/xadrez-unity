@@ -6,7 +6,7 @@ public class QueenMovement : Moviment
 {
     public QueenMovement()
     {
-        value = 9;
+        value = 900;
     }
     public override List<Tile> GetValidMoves()
     {

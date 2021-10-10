@@ -6,7 +6,7 @@ public class KnightMovement : Moviment
 {
     public KnightMovement()
     {
-        value = 3;
+        value = 300;
     }
     public override List<Tile> GetValidMoves()
     {

@@ -6,7 +6,7 @@ public class BishopMovement : Moviment
 {
     public BishopMovement()
     {
-        value = 3;
+        value = 300;
     }
     public override List<Tile> GetValidMoves()
     {

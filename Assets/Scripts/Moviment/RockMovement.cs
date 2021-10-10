@@ -6,7 +6,7 @@ public class RockMovement : Moviment
 {
     public RockMovement()
     {
-        value = 5;
+        value = 500;
     }
     public override List<Tile> GetValidMoves()
     {

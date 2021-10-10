@@ -6,7 +6,7 @@ public class PawnMoviment : Moviment
 {
     public PawnMoviment()
     {
-        value = 1;
+        value = 100;
     }
     public override List<Tile> GetValidMoves()
     {
