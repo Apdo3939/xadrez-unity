@@ -8,9 +8,9 @@ public class KingMoviment : Moviment
     {
         value = 10000;
     }
-    public override List<Tile> GetValidMoves()
+    public override List<AvailableMoves> GetValidMoves()
     {
-        List<Tile> moves = new List<Tile>();
+        List<AvailableMoves> moves = new List<AvailableMoves>();
 
         moves.AddRange(UntilBlockedPath(new Vector2Int(1, 0), true, 1));
         moves.AddRange(UntilBlockedPath(new Vector2Int(-1, 0), true, 1));
@@ -24,15 +24,13 @@ public class KingMoviment : Moviment
         moves.AddRange(UntilBlockedPath(new Vector2Int(-1, 1), true, 1));
         moves.AddRange(UntilBlockedPath(new Vector2Int(1, -1), true, 1));
 
-        SetNormalMove(moves);
-
         moves.AddRange(Castling());
         return moves;
     }
 
-    List<Tile> Castling()
+    List<AvailableMoves> Castling()
     {
-        List<Tile> moves = new List<Tile>();
+        List<AvailableMoves> moves = new List<AvailableMoves>();
         if (Board.instance.selectedPiece.wasMoved)
         {
             return moves;
@@ -40,14 +38,12 @@ public class KingMoviment : Moviment
         Tile temp = CheckRock(new Vector2Int(1, 0));
         if (temp != null)
         {
-            temp.moveType = MoveType.Castling;
-            moves.Add(temp);
+            moves.Add(new AvailableMoves(temp.pos, MoveType.Castling));
         }
         temp = CheckRock(new Vector2Int(-1, 0));
         if (temp != null)
         {
-            temp.moveType = MoveType.Castling;
-            moves.Add(temp);
+            moves.Add(new AvailableMoves(temp.pos, MoveType.Castling));
         }
         return moves;
     }

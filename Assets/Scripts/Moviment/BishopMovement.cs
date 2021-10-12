@@ -8,9 +8,9 @@ public class BishopMovement : Moviment
     {
         value = 300;
     }
-    public override List<Tile> GetValidMoves()
+    public override List<AvailableMoves> GetValidMoves()
     {
-        List<Tile> moves = new List<Tile>();
+        List<AvailableMoves> moves = new List<AvailableMoves>();
 
         int limit = 99;
 
@@ -19,8 +19,6 @@ public class BishopMovement : Moviment
 
         moves.AddRange(UntilBlockedPath(new Vector2Int(-1, 1), true, limit));
         moves.AddRange(UntilBlockedPath(new Vector2Int(1, -1), true, limit));
-
-        SetNormalMove(moves);
 
         return moves;
     }

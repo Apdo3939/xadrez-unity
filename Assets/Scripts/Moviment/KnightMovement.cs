@@ -8,21 +8,20 @@ public class KnightMovement : Moviment
     {
         value = 300;
     }
-    public override List<Tile> GetValidMoves()
+    public override List<AvailableMoves> GetValidMoves()
     {
-        List<Tile> moves = new List<Tile>();
+        List<AvailableMoves> moves = new List<AvailableMoves>();
         moves.AddRange(GetMoveKnight1(new Vector2Int(0, 1)));
         moves.AddRange(GetMoveKnight1(new Vector2Int(0, -1)));
         moves.AddRange(GetMoveKnight1(new Vector2Int(1, 0)));
         moves.AddRange(GetMoveKnight1(new Vector2Int(-1, 0)));
 
-        SetNormalMove(moves);
         return moves;
     }
 
-    List<Tile> GetMoveKnight1(Vector2Int direction)
+    List<AvailableMoves> GetMoveKnight1(Vector2Int direction)
     {
-        List<Tile> moves = new List<Tile>();
+        List<AvailableMoves> moves = new List<AvailableMoves>();
         Tile current = Board.instance.selectedPiece.tile;
         Tile temp = GetTile(current.pos + direction * 2);
         if (temp != null)
@@ -32,18 +31,18 @@ public class KnightMovement : Moviment
         return moves;
     }
 
-    List<Tile> GetMoveKnight2(Vector2Int pos, Vector2Int direction)
+    List<AvailableMoves> GetMoveKnight2(Vector2Int pos, Vector2Int direction)
     {
-        List<Tile> moves = new List<Tile>();
+        List<AvailableMoves> moves = new List<AvailableMoves>();
         Tile tile1 = GetTile(pos + direction);
         Tile tile2 = GetTile(pos - direction);
         if (tile1 != null && (tile1.content == null || IsEnemy(tile1)))
         {
-            moves.Add(tile1);
+            moves.Add(new AvailableMoves(tile1.pos));
         }
         if (tile2 != null && (tile2.content == null || IsEnemy(tile2)))
         {
-            moves.Add(tile2);
+            moves.Add(new AvailableMoves(tile2.pos));
         }
         return moves;
     }

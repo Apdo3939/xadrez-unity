@@ -6,11 +6,11 @@ using UnityEngine;
 public class PieceMovementState : State
 {
     public static List<AffectedPiece> changes;
+    public static AvailableMoves enPassantFlags;
     public override async void Enter()
     {
-        Debug.Log("Piece Moved...");
         TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-        MovePiece(tcs, false);
+        MovePiece(tcs, false, Board.instance.selectedMove.moveType);
         await tcs.Task;
         machine.ChangeTo<TurnEndState>();
     }
@@ -20,12 +20,10 @@ public class PieceMovementState : State
         base.Exit();
     }
 
-    public static void MovePiece(TaskCompletionSource<bool> tcs, bool skipMovements)
+    public static void MovePiece(TaskCompletionSource<bool> tcs, bool skipMovements, MoveType moveType)
     {
         changes = new List<AffectedPiece>();
-        MoveType moveType = Board.instance.selectedHighlight.tile.moveType;
-        ClearEnPassants();
-
+        enPassantFlags = new AvailableMoves();
         switch (moveType)
         {
             case MoveType.Normal:
@@ -45,62 +43,66 @@ public class PieceMovementState : State
                 break;
         }
     }
-
     static void NormalMove(TaskCompletionSource<bool> tcs, bool skipMovements)
     {
         Piece piece = Board.instance.selectedPiece;
-
         AffectedPiece pieceMoving = new AffectedPiece();
         pieceMoving.piece = piece;
         pieceMoving.from = piece.tile;
-        pieceMoving.to = Board.instance.selectedHighlight.tile;
+        pieceMoving.to = Board.instance.tiles[Board.instance.selectedMove.pos];
         pieceMoving.wasMoved = piece.wasMoved;
-        changes.Add(pieceMoving);
+        changes.Insert(0, pieceMoving);
 
         piece.tile.content = null;
-        piece.tile = Board.instance.selectedHighlight.tile;
+        piece.tile = pieceMoving.to;
 
         if (piece.tile.content != null)
         {
-            Piece deadPiece = piece.tile.content;
-
+            Piece deadPiece = piece.tile.content as Piece;
             AffectedPiece pieceKilled = new AffectedPiece();
             pieceKilled.piece = deadPiece;
-            pieceKilled.from = pieceKilled.to = piece.tile;
+            pieceKilled.to = pieceKilled.from = piece.tile;
             changes.Add(pieceKilled);
-            //Debug.Log("Piece {0}... removida", deadPiece.transform);
             deadPiece.gameObject.SetActive(false);
         }
 
         piece.tile.content = piece;
         piece.wasMoved = true;
 
+        Vector3 vPos = new Vector3(Board.instance.selectedMove.pos.x, Board.instance.selectedMove.pos.y, 0);
         if (skipMovements)
         {
-            piece.wasMoved = true;
-            //piece.transform.position = Board.instance.selectedHighlight.transform.position;
+            //piece.wasMoved = true;
+            //piece.transform.position = vPos;
             tcs.SetResult(true);
         }
         else
         {
-            piece.wasMoved = true; //add for IA
-            float timing = Vector3.Distance(piece.transform.position, Board.instance.selectedHighlight.transform.position) * 0.5f;
-            LeanTween.move(piece.gameObject, Board.instance.selectedHighlight.transform.position, timing).setOnComplete(() =>
+            //piece.wasMoved = true;
+            float timing = Vector3.Distance(piece.transform.position, vPos) * 0.5f;
+            LeanTween.move(piece.gameObject, vPos, timing).setOnComplete(() =>
             {
                 tcs.SetResult(true);
             });
         }
     }
-
     static void Castling(TaskCompletionSource<bool> tcs, bool skipMovements)
     {
         Piece king = Board.instance.selectedPiece;
+        AffectedPiece affectedKing = new AffectedPiece();
+        affectedKing.from = king.tile;
         king.tile.content = null;
-        Piece rock = Board.instance.selectedHighlight.tile.content;
+        affectedKing.wasMoved = king.wasMoved;
+        affectedKing.piece = king;
+
+        Piece rock = Board.instance.tiles[Board.instance.selectedMove.pos].content;
+        AffectedPiece affectedRock = new AffectedPiece();
+        affectedRock.from = rock.tile;
         rock.tile.content = null;
+        affectedRock.wasMoved = rock.wasMoved;
+        affectedRock.piece = rock;
 
         Vector2Int direction = rock.tile.pos - king.tile.pos;
-
         if (direction.x > 0)
         {
             king.tile = Board.instance.tiles[new Vector2Int(king.tile.pos.x + 2, king.tile.pos.y)];
@@ -113,55 +115,49 @@ public class PieceMovementState : State
         }
 
         king.tile.content = king;
+        affectedKing.to = king.tile;
+        changes.Add(affectedKing);
         rock.tile.content = rock;
+        affectedRock.to = rock.tile;
+        changes.Add(affectedRock);
         king.wasMoved = true;
         rock.wasMoved = true;
 
-        float timingKing = Vector3.Distance(king.transform.position, Board.instance.selectedHighlight.transform.position) * 0.5f;
-        LeanTween.move(king.gameObject, new Vector3(king.tile.pos.x, king.tile.pos.y, 0), timingKing).setOnComplete(() =>
-       {
-           tcs.SetResult(true);
-       });
-
-        LeanTween.move(rock.gameObject, new Vector3(rock.tile.pos.x, rock.tile.pos.y, 0), timingKing - 0.1f);
-    }
-
-    static void ClearEnPassants()
-    {
-        ClearEnPassants(5);
-        ClearEnPassants(2);
-    }
-
-    static void ClearEnPassants(int height)
-    {
-        Vector2Int positions = new Vector2Int(0, height);
-        for (int i = 0; i < 7; i++)
+        if (skipMovements)
         {
-            positions.x = positions.x + 1;
-            Board.instance.tiles[positions].moveType = MoveType.Normal;
-
+            tcs.SetResult(true);
+        }
+        else
+        {
+            LeanTween.move(king.gameObject, new Vector3(king.tile.pos.x, king.tile.pos.y, 0), 1.5f).setOnComplete(() => { tcs.SetResult(true); });
+            LeanTween.move(rock.gameObject, new Vector3(rock.tile.pos.x, rock.tile.pos.y, 0), 1.4f);
         }
     }
-
     static void PawnDoubleMove(TaskCompletionSource<bool> tcs, bool skipMovements)
     {
         Piece pawn = Board.instance.selectedPiece;
-        Vector2Int direction = pawn.tile.pos.y > Board.instance.selectedHighlight.tile.pos.y ? new Vector2Int(0, -1) :
-        new Vector2Int(0, 1);
-        Board.instance.tiles[pawn.tile.pos + direction].moveType = MoveType.EnPassant;
+        Vector2Int direction = pawn.maxTeam ?
+            new Vector2Int(0, 1) :
+            new Vector2Int(0, -1);
+        enPassantFlags = new AvailableMoves(pawn.tile.pos + direction, MoveType.EnPassant);
         NormalMove(tcs, skipMovements);
     }
     static void EnPassant(TaskCompletionSource<bool> tcs, bool skipMovements)
     {
         Piece pawn = Board.instance.selectedPiece;
-        Vector2Int direction = pawn.tile.pos.y > Board.instance.selectedHighlight.tile.pos.y ? new Vector2Int(0, 1) :
-        new Vector2Int(0, -1);
-        Tile enemy = Board.instance.tiles[Board.instance.selectedHighlight.tile.pos + direction];
+        Vector2Int direction = pawn.maxTeam ?
+            new Vector2Int(0, -1) :
+            new Vector2Int(0, 1);
+        Tile enemy = Board.instance.tiles[Board.instance.selectedMove.pos + direction];
+        AffectedPiece affectedPieceEnemy = new AffectedPiece();
+        affectedPieceEnemy.from = affectedPieceEnemy.to = enemy;
+        affectedPieceEnemy.piece = enemy.content;
+        affectedPieceEnemy.wasMoved = enemy.content.wasMoved;
+        changes.Add(affectedPieceEnemy);
         enemy.content.gameObject.SetActive(false);
         enemy.content = null;
         NormalMove(tcs, skipMovements);
     }
-
     static async void Promotion(TaskCompletionSource<bool> tcs, bool skipMovements)
     {
         TaskCompletionSource<bool> movementTcs = new TaskCompletionSource<bool>();
@@ -171,9 +167,7 @@ public class PieceMovementState : State
 
         StateMachineController.instance.taskHold = new TaskCompletionSource<object>();
         StateMachineController.instance.promotionPanel.SetActive(true);
-
         await StateMachineController.instance.taskHold.Task;
-
         string result = StateMachineController.instance.taskHold.Task.Result as string;
 
         if (result == "Knight")
@@ -186,6 +180,5 @@ public class PieceMovementState : State
         }
         StateMachineController.instance.promotionPanel.SetActive(false);
         tcs.SetResult(true);
-
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class Moviment
 {
-    public abstract List<Tile> GetValidMoves();
+    public abstract List<AvailableMoves> GetValidMoves();
     public int value;
 
     protected bool IsEnemy(Tile tile)
@@ -23,9 +23,9 @@ public abstract class Moviment
         return tile;
     }
 
-    protected List<Tile> UntilBlockedPath(Vector2Int direction, bool includeBlocked, int limit)
+    protected List<AvailableMoves> UntilBlockedPath(Vector2Int direction, bool includeBlocked, int limit)
     {
-        List<Tile> moves = new List<Tile>();
+        List<AvailableMoves> moves = new List<AvailableMoves>();
         Tile current = Board.instance.selectedPiece.tile;
         while (current != null && moves.Count < limit)
         {
@@ -33,13 +33,13 @@ public abstract class Moviment
             {
                 if (current.content == null)
                 {
-                    moves.Add(current);
+                    moves.Add(new AvailableMoves(current.pos));
                 }
                 else if (IsEnemy(current))
                 {
                     if (includeBlocked)
                     {
-                        moves.Add(current);
+                        moves.Add(new AvailableMoves(current.pos));
                     }
                     return moves;
                 }
@@ -50,13 +50,5 @@ public abstract class Moviment
             }
         }
         return moves;
-    }
-
-    protected void SetNormalMove(List<Tile> tiles)
-    {
-        foreach (Tile t in tiles)
-        {
-            t.moveType = MoveType.Normal;
-        }
     }
 }

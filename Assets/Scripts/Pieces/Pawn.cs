@@ -4,8 +4,17 @@ using UnityEngine;
 
 public class Pawn : Piece
 {
-    private void Awake()
+    protected override void start()
     {
-        moviment = new PawnMoviment();
+        base.start();
+        moviment = new PawnMoviment(GetDirection());
+    }
+    Vector2Int GetDirection()
+    {
+        if (maxTeam)
+        {
+            return new Vector2Int(0, 1);
+        }
+        return new Vector2Int(0, -1);
     }
 }

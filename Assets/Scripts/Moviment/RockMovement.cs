@@ -8,9 +8,9 @@ public class RockMovement : Moviment
     {
         value = 500;
     }
-    public override List<Tile> GetValidMoves()
+    public override List<AvailableMoves> GetValidMoves()
     {
-        List<Tile> moves = new List<Tile>();
+        List<AvailableMoves> moves = new List<AvailableMoves>();
 
         int limit = 99;
 
@@ -19,7 +19,7 @@ public class RockMovement : Moviment
 
         moves.AddRange(UntilBlockedPath(new Vector2Int(0, 1), true, limit));
         moves.AddRange(UntilBlockedPath(new Vector2Int(0, -1), true, limit));
-        SetNormalMove(moves);
+
         return moves;
     }
 }

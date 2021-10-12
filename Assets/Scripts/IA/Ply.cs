@@ -8,8 +8,8 @@ public class Ply
     public List<PieceEvaluation> greens;
     public int score;
     public List<AffectedPiece> changes;
-    public MoveType moveType;
     public Ply originPly;
     public Ply bestFuture;
     public List<Ply> futurePlies;
+    public AvailableMoves enPassantFlags;
 }

@@ -4,51 +4,40 @@ using UnityEngine;
 
 public class PawnMoviment : Moviment
 {
-    public PawnMoviment()
+    Vector2Int direction;
+    public PawnMoviment(Vector2Int rcvDirection)
     {
         value = 100;
+        direction = rcvDirection;
     }
-    public override List<Tile> GetValidMoves()
+    public override List<AvailableMoves> GetValidMoves()
     {
-        Vector2Int direction = GetDirection();
-        List<Tile> moveable = GetPawnAttack(direction);
-        List<Tile> moves;
+        List<AvailableMoves> moveable = GetPawnAttack(direction);
+        List<AvailableMoves> moves;
 
         if (!Board.instance.selectedPiece.wasMoved)
         {
             moves = UntilBlockedPath(direction, false, 2);
-            SetNormalMove(moves);
             if (moves.Count == 2)
             {
-                moves[1].moveType = MoveType.PawnDoubleMove;
+                moves[1] = new AvailableMoves(moves[1].pos, MoveType.PawnDoubleMove);
             }
         }
         else
         {
             moves = UntilBlockedPath(direction, false, 1);
-            SetNormalMove(moves);
+            if (moves.Count > 0)
+            {
+                moves[0] = CheckPromotion(moves[0]);
+            }
+
         }
-
         moveable.AddRange(moves);
-
-        CheckPromotion(moves);
-
         return moveable;
     }
-
-    Vector2Int GetDirection()
+    List<AvailableMoves> GetPawnAttack(Vector2Int direction)
     {
-        if (Board.instance.selectedPiece.transform.parent.name == "GreenPieces")
-        {
-            //StateMachineController.instance.currentlyPlaying.transform.name
-            return new Vector2Int(0, -1);
-        }
-        return new Vector2Int(0, 1);
-    }
-
-    List<Tile> GetPawnAttack(Vector2Int direction)
-    {
-        List<Tile> pawnAttack = new List<Tile>();
+        List<AvailableMoves> pawnAttack = new List<AvailableMoves>();
         Piece piece = Board.instance.selectedPiece;
         Vector2Int leftPos = new Vector2Int(piece.tile.pos.x - 1, piece.tile.pos.y + direction.y);
         Vector2Int rightPos = new Vector2Int(piece.tile.pos.x + 1, piece.tile.pos.y + direction.y);
@@ -59,33 +48,33 @@ public class PawnMoviment : Moviment
         return pawnAttack;
     }
 
-    void GetPawnAttack(Tile tile, List<Tile> pawnAttack)
+    void GetPawnAttack(Tile tile, List<AvailableMoves> pawnAttack)
     {
         if (tile == null)
         {
             return;
         }
-
         if (IsEnemy(tile))
         {
-            tile.moveType = MoveType.Normal;
-            pawnAttack.Add(tile);
+            pawnAttack.Add(new AvailableMoves(tile.pos, MoveType.Normal));
         }
-        else if (tile.moveType == MoveType.EnPassant)
+        else if (PieceMovementState.enPassantFlags.moveType == MoveType.EnPassant && PieceMovementState.enPassantFlags.pos == tile.pos)
         {
-            pawnAttack.Add(tile);
+            pawnAttack.Add(new AvailableMoves(tile.pos, MoveType.EnPassant));
         }
     }
 
-    void CheckPromotion(List<Tile> tiles)
+    AvailableMoves CheckPromotion(AvailableMoves availableMove)
     {
-        foreach (Tile t in tiles)
+        int promotionHeight = 0;
+        if (Board.instance.selectedPiece.maxTeam)
         {
-            if (t.pos.y == 0 || t.pos.y == 7)
-            {
-                t.moveType = MoveType.Promotion;
-                Debug.Log("Promotion");
-            }
+            promotionHeight = 7;
         }
+        if (availableMove.pos.y != promotionHeight)
+        {
+            return availableMove;
+        }
+        return new AvailableMoves(availableMove.pos, MoveType.Promotion);
     }
 }

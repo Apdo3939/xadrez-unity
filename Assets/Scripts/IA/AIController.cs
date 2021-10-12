@@ -11,6 +11,7 @@ public class AIController : MonoBehaviour
     public int objectivePlyDepth = 2;
     int calculationCount;
     float lastInterval;
+    public AvailableMoves enPassantSaved;
 
     void Awake()
     {
@@ -22,19 +23,25 @@ public class AIController : MonoBehaviour
     {
         lastInterval = Time.realtimeSinceStartup;
         int minimaxDirection = 1;
+        enPassantSaved = PieceMovementState.enPassantFlags;
         currentState = CreateSnapShot();
         calculationCount = 0;
+
         Ply currentPly = currentState;
         currentPly.originPly = null;
         int currentPlyDepth = 0;
         currentPly.changes = new List<AffectedPiece>();
         Debug.Log("Start");
-        Task<Ply> calculation = CalculatePly(currentPly, GetTeam(currentPly, minimaxDirection), currentPlyDepth, minimaxDirection);
+        Task<Ply> calculation = CalculatePly(currentPly,
+            GetTeam(currentPly, minimaxDirection),
+            currentPlyDepth, minimaxDirection);
         await calculation;
         currentPly.bestFuture = calculation.Result;
+
         Debug.Log("Calculations: " + calculationCount);
-        //Debug.Log("Time: " + (Time.realtimeSinceStartup - lastInterval));
+        Debug.Log("Time: " + (Time.realtimeSinceStartup - lastInterval));
         PrintBestPly(currentPly.bestFuture);
+        PieceMovementState.enPassantFlags = enPassantSaved;
     }
 
     List<PieceEvaluation> GetTeam(Ply ply, int minimaxDirection)
@@ -64,25 +71,30 @@ public class AIController : MonoBehaviour
 
         foreach (PieceEvaluation eva in team)
         {
-            foreach (Tile t in eva.availableMoves)
+            foreach (AvailableMoves move in eva.availableMoves)
             {
                 calculationCount++;
                 Board.instance.selectedPiece = eva.piece;
-                Board.instance.selectedHighlight = AIhighlight;
-                AIhighlight.tile = t;
-                AIhighlight.transform.position = new Vector3(t.pos.x, t.pos.y, 0);
+                Board.instance.selectedMove = move;
                 TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-                PieceMovementState.MovePiece(tcs, true);
+                PieceMovementState.MovePiece(tcs, true, move.moveType);
+
                 await tcs.Task;
                 Ply newPly = CreateSnapShot(parentPly);
                 newPly.changes = PieceMovementState.changes;
-                //Debug.Log(newPly.name);
-                Task<Ply> calculation = CalculatePly(newPly, GetTeam(newPly, minimaxDirection * -1), currentPlyDepth, minimaxDirection * -1);
+                newPly.enPassantFlags = PieceMovementState.enPassantFlags;
+
+                List<PieceEvaluation> nextTeam = GetTeam(newPly, minimaxDirection * -1);
+                Task<Ply> calculation = CalculatePly(newPly,
+                    nextTeam,
+                    currentPlyDepth, minimaxDirection * -1);
                 await calculation;
+
                 parentPly.bestFuture = IsBest(parentPly.bestFuture, minimaxDirection, calculation.Result);
-                newPly.moveType = t.moveType;
                 newPly.originPly = parentPly;
                 parentPly.futurePlies.Add(newPly);
+
+                PieceMovementState.enPassantFlags = parentPly.enPassantFlags;
                 ResetBoard(newPly);
             }
         }
@@ -190,6 +202,7 @@ public class AIController : MonoBehaviour
             p.piece.tile.content = null;
             p.piece.tile = p.from;
             p.from.content = p.piece;
+            p.piece.wasMoved = p.wasMoved;
             //p.piece.transform.position = new Vector3(p.from.pos.x, p.from.pos.y, 0);
             p.piece.gameObject.SetActive(true);
         }

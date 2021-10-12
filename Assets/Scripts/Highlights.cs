@@ -14,9 +14,9 @@ public class Highlights : MonoBehaviour
         instance = this;
     }
 
-    public void SelectTiles(List<Tile> tiles)
+    public void SelectTiles(List<AvailableMoves> availableMoves)
     {
-        foreach (Tile t in tiles)
+        foreach (AvailableMoves move in availableMoves)
         {
             if (onReserve.Count == 0)
             {
@@ -25,10 +25,9 @@ public class Highlights : MonoBehaviour
             SpriteRenderer sr = onReserve.Dequeue();
             sr.gameObject.SetActive(true);
             sr.color = StateMachineController.instance.currentlyPlaying.color;
-            sr.transform.position = new Vector3(t.pos.x, t.pos.y, 0);
-            sr.GetComponent<HighlightsClick>().tile = t;
+            sr.transform.position = new Vector3(move.pos.x, move.pos.y, 0);
+            sr.GetComponent<HighlightsClick>().move = move;
             activeHighlights.Enqueue(sr);
-            Debug.Log("Highlights created");
         }
     }
     public void DeSelectTiles()
