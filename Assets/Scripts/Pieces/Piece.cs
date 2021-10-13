@@ -9,12 +9,16 @@ public abstract class Piece : MonoBehaviour
     public Tile tile = new Tile();
     public bool wasMoved;
     public bool maxTeam;
-    virtual protected void start()
+    virtual protected void Start()
     {
         if (transform.parent.name == "GoldPieces")
         {
             maxTeam = true;
         }
+    }
+    public virtual AffectedPiece CreatedAffected()
+    {
+        return new AffectedPiece();
     }
     void OnMouseDown()
     {

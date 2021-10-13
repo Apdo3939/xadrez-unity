@@ -12,10 +12,16 @@ public class AIController : MonoBehaviour
     int calculationCount;
     float lastInterval;
     public AvailableMoves enPassantSaved;
+    Ply minPly;
+    Ply maxPly;
 
     void Awake()
     {
         instance = this;
+        maxPly = new Ply();
+        maxPly.score = 999999;
+        minPly = new Ply();
+        minPly.score = -999999;
     }
 
     [ContextMenu("Calculate Plays")]
@@ -65,9 +71,14 @@ public class AIController : MonoBehaviour
             EvaluateBoard(parentPly);
             return parentPly;
         }
-        Ply plyceHolder = new Ply();
-        plyceHolder.score = -9999999 * minimaxDirection;
-        parentPly.bestFuture = plyceHolder;
+        if (minimaxDirection == 1)
+        {
+            parentPly.bestFuture = minPly;
+        }
+        else
+        {
+            parentPly.bestFuture = maxPly;
+        }
 
         foreach (PieceEvaluation eva in team)
         {
@@ -199,12 +210,7 @@ public class AIController : MonoBehaviour
     {
         foreach (AffectedPiece p in ply.changes)
         {
-            p.piece.tile.content = null;
-            p.piece.tile = p.from;
-            p.from.content = p.piece;
-            p.piece.wasMoved = p.wasMoved;
-            //p.piece.transform.position = new Vector3(p.from.pos.x, p.from.pos.y, 0);
-            p.piece.gameObject.SetActive(true);
+            p.Undo();
         }
     }
 

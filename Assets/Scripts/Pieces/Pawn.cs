@@ -4,10 +4,19 @@ using UnityEngine;
 
 public class Pawn : Piece
 {
-    protected override void start()
+    public Moviment savedMovement;
+    public Moviment queenMovement = new QueenMovement();
+    public Moviment knightMovement = new KnightMovement();
+    protected override void Start()
     {
-        base.start();
-        moviment = new PawnMoviment(GetDirection());
+        base.Start();
+        moviment = savedMovement = new PawnMoviment(GetDirection());
+    }
+    public override AffectedPiece CreatedAffected()
+    {
+        AffectedPiecePawn aff = new AffectedPiecePawn();
+        aff.wasMoved = wasMoved;
+        return aff;
     }
     Vector2Int GetDirection()
     {

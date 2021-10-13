@@ -756,7 +756,6 @@ MonoBehaviour:
   goldPieces: []
   greenPieces: []
   selectedPiece: {fileID: 0}
-  selectedHighlight: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -2434,6 +2433,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AIhighlight: {fileID: 564709644}
+  objectivePlyDepth: 3
 --- !u!4 &1685230979
 Transform:
   m_ObjectHideFlags: 0
