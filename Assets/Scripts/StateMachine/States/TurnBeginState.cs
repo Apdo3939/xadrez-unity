@@ -19,6 +19,13 @@ public class TurnBeginState : State
 
         Debug.Log("Turn begin " + machine.currentlyPlaying + " now playing");
         await Task.Delay(100);
-        machine.ChangeTo<PieceSelectionState>();
+        if (machine.currentlyPlaying.AIControlled)
+        {
+            machine.ChangeTo<AIPlayingState>();
+        }
+        else
+        {
+            machine.ChangeTo<PieceSelectionState>();
+        }
     }
 }

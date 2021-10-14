@@ -5,10 +5,21 @@ using UnityEngine;
 public class PawnMoviment : Moviment
 {
     Vector2Int direction;
-    public PawnMoviment(Vector2Int rcvDirection)
+    int promotionHeight = 0;
+    public PawnMoviment(bool maxTeam)
     {
         value = 100;
-        direction = rcvDirection;
+        if (maxTeam)
+        {
+            direction = new Vector2Int(0, 1);
+            promotionHeight = 7;
+        }
+        else
+        {
+            direction = new Vector2Int(0, -1);
+            promotionHeight = 0;
+        }
+
     }
     public override List<AvailableMoves> GetValidMoves()
     {

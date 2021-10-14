@@ -25,19 +25,28 @@ public class AIController : MonoBehaviour
     }
 
     [ContextMenu("Calculate Plays")]
-    public async void CalculatePlay()
+    public async Task<Ply> CalculatePlays()
     {
         lastInterval = Time.realtimeSinceStartup;
-        int minimaxDirection = 1;
+        int minimaxDirection;
+
+        if (StateMachineController.instance.currentlyPlaying == StateMachineController.instance.player1)
+        {
+            minimaxDirection = 1;
+        }
+        else
+        {
+            minimaxDirection = -1;
+        }
+
         enPassantSaved = PieceMovementState.enPassantFlags;
-        currentState = CreateSnapShot();
+        Ply currentPly = CreateSnapShot();
         calculationCount = 0;
 
-        Ply currentPly = currentState;
         currentPly.originPly = null;
         int currentPlyDepth = 0;
         currentPly.changes = new List<AffectedPiece>();
-        Debug.Log("Start");
+
         Task<Ply> calculation = CalculatePly(currentPly,
             GetTeam(currentPly, minimaxDirection),
             currentPlyDepth, minimaxDirection);
@@ -48,6 +57,7 @@ public class AIController : MonoBehaviour
         Debug.Log("Time: " + (Time.realtimeSinceStartup - lastInterval));
         PrintBestPly(currentPly.bestFuture);
         PieceMovementState.enPassantFlags = enPassantSaved;
+        return currentPly.bestFuture;
     }
 
     List<PieceEvaluation> GetTeam(Ply ply, int minimaxDirection)
