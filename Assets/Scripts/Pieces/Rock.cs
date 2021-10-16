@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class Rock : Piece
 {
-    private void Awake()
+    protected override void Start()
     {
-        moviment = new RockMovement();
+        base.Start();
+        moviment = new RockMovement(maxTeam);
     }
     public override AffectedPiece CreatedAffected()
     {

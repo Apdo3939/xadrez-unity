@@ -2434,7 +2434,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AIhighlight: {fileID: 564709644}
-  objectivePlyDepth: 1
+  objectivePlyDepth: 2
 --- !u!4 &1685230979
 Transform:
   m_ObjectHideFlags: 0
@@ -2755,7 +2755,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 1, g: 0.8207309, b: 0, a: 1}
-  AIControlled: 1
+  AIControlled: 0
 --- !u!1001 &595810273463066616
 PrefabInstance:
   m_ObjectHideFlags: 0

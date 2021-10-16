@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Bishop : Piece
 {
-    private void Awake()
+    protected override void Start()
     {
-        moviment = new BishopMovement();
+        base.Start();
+        moviment = new BishopMovement(maxTeam);
     }
 }

@@ -68,16 +68,16 @@ public class PieceMovementState : State
         piece.tile.content = piece;
         piece.wasMoved = true;
 
-        Vector3 vPos = new Vector3(Board.instance.selectedMove.pos.x, Board.instance.selectedMove.pos.y, 0);
         if (skipMovements)
         {
-            //piece.wasMoved = true;
+            piece.wasMoved = true;
+            //Vector3 vPos = new Vector3(Board.instance.selectedMove.pos.x, Board.instance.selectedMove.pos.y, 0);
             //piece.transform.position = vPos;
             tcs.SetResult(true);
         }
         else
         {
-            //piece.wasMoved = true;
+            Vector3 vPos = new Vector3(Board.instance.selectedMove.pos.x, Board.instance.selectedMove.pos.y, 0);
             float timing = Vector3.Distance(piece.transform.position, vPos) * 0.5f;
             LeanTween.move(piece.gameObject, vPos, timing).setOnComplete(() =>
             {

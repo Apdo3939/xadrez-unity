@@ -4,9 +4,17 @@ using UnityEngine;
 
 public class QueenMovement : Moviment
 {
-    public QueenMovement()
+    public QueenMovement(bool maxTeam)
     {
         value = 900;
+        if (maxTeam)
+        {
+            positionValue = AIController.instance.squareTable.queenGold;
+        }
+        else
+        {
+            positionValue = AIController.instance.squareTable.queenGreen;
+        }
     }
     public override List<AvailableMoves> GetValidMoves()
     {

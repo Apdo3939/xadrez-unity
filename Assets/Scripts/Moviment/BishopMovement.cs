@@ -4,9 +4,17 @@ using UnityEngine;
 
 public class BishopMovement : Moviment
 {
-    public BishopMovement()
+    public BishopMovement(bool maxTeam)
     {
         value = 300;
+        if (maxTeam)
+        {
+            positionValue = AIController.instance.squareTable.bishopGold;
+        }
+        else
+        {
+            positionValue = AIController.instance.squareTable.bishopGreen;
+        }
     }
     public override List<AvailableMoves> GetValidMoves()
     {

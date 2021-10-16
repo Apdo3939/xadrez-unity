@@ -6,6 +6,7 @@ public abstract class Moviment
 {
     public abstract List<AvailableMoves> GetValidMoves();
     public int value;
+    public Dictionary<Vector2Int, int> positionValue;
 
     protected bool IsEnemy(Tile tile)
     {

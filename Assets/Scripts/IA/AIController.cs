@@ -12,6 +12,7 @@ public class AIController : MonoBehaviour
     int calculationCount;
     float lastInterval;
     public AvailableMoves enPassantSaved;
+    public PieceSquareTable squareTable = new PieceSquareTable();
     Ply minPly;
     Ply maxPly;
 
@@ -22,6 +23,7 @@ public class AIController : MonoBehaviour
         maxPly.score = 999999;
         minPly = new Ply();
         minPly.score = -999999;
+        squareTable.SetDictionaries();
     }
 
     [ContextMenu("Calculate Plays")]
@@ -213,7 +215,8 @@ public class AIController : MonoBehaviour
 
     void EvaluatePiece(PieceEvaluation eva, Ply ply, int scoreDirection)
     {
-        ply.score += eva.piece.moviment.value * scoreDirection;
+        int positionValue = eva.piece.moviment.positionValue[eva.piece.tile.pos];
+        ply.score += (eva.piece.moviment.value + positionValue) * scoreDirection;
     }
 
     void ResetBoard(Ply ply)

@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class King : Piece
 {
-    private void Awake()
+    protected override void Start()
     {
-        moviment = new KingMoviment();
+        base.Start();
+        moviment = new KingMoviment(maxTeam);
     }
 
     public override AffectedPiece CreatedAffected()

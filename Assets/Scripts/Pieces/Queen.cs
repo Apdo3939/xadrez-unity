@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Queen : Piece
 {
-    private void Awake()
+    protected override void Start()
     {
-        moviment = new QueenMovement();
+        base.Start();
+        moviment = new QueenMovement(maxTeam);
     }
 }

@@ -13,11 +13,13 @@ public class PawnMoviment : Moviment
         {
             direction = new Vector2Int(0, 1);
             promotionHeight = 7;
+            positionValue = AIController.instance.squareTable.pawnGold;
         }
         else
         {
             direction = new Vector2Int(0, -1);
             promotionHeight = 0;
+            positionValue = AIController.instance.squareTable.pawnGreen;
         }
 
     }
@@ -77,11 +79,6 @@ public class PawnMoviment : Moviment
 
     AvailableMoves CheckPromotion(AvailableMoves availableMove)
     {
-        int promotionHeight = 0;
-        if (Board.instance.selectedPiece.maxTeam)
-        {
-            promotionHeight = 7;
-        }
         if (availableMove.pos.y != promotionHeight)
         {
             return availableMove;

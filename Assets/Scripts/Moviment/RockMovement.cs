@@ -4,9 +4,17 @@ using UnityEngine;
 
 public class RockMovement : Moviment
 {
-    public RockMovement()
+    public RockMovement(bool maxTeam)
     {
         value = 500;
+        if (maxTeam)
+        {
+            positionValue = AIController.instance.squareTable.rockGold;
+        }
+        else
+        {
+            positionValue = AIController.instance.squareTable.rockGreen;
+        }
     }
     public override List<AvailableMoves> GetValidMoves()
     {

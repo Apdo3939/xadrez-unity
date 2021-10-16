@@ -4,9 +4,17 @@ using UnityEngine;
 
 public class KingMoviment : Moviment
 {
-    public KingMoviment()
+    public KingMoviment(bool maxTeam)
     {
         value = 10000;
+        if (maxTeam)
+        {
+            positionValue = AIController.instance.squareTable.kingGold;
+        }
+        else
+        {
+            positionValue = AIController.instance.squareTable.kingGreen;
+        }
     }
     public override List<AvailableMoves> GetValidMoves()
     {

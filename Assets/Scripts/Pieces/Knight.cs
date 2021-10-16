@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Knight : Piece
 {
-    private void Awake()
+    protected override void Start()
     {
-        moviment = new KnightMovement();
+        base.Start();
+        moviment = new KnightMovement(maxTeam);
     }
 }
