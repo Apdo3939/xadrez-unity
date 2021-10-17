@@ -10,6 +10,6 @@ public class Ply
     public List<AffectedPiece> changes;
     public Ply originPly;
     public Ply bestFuture;
-    public List<Ply> futurePlies;
+    //public List<Ply> futurePlies;
     public AvailableMoves enPassantFlags;
 }

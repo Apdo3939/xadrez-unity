@@ -50,7 +50,7 @@ public class AIController : MonoBehaviour
         currentPly.changes = new List<AffectedPiece>();
 
         Task<Ply> calculation = CalculatePly(currentPly,
-            GetTeam(currentPly, minimaxDirection),
+            GetTeam(currentPly, minimaxDirection), -1000000, 1000000,
             currentPlyDepth, minimaxDirection);
         await calculation;
         currentPly.bestFuture = calculation.Result;
@@ -74,9 +74,9 @@ public class AIController : MonoBehaviour
         }
     }
 
-    async Task<Ply> CalculatePly(Ply parentPly, List<PieceEvaluation> team, int currentPlyDepth, int minimaxDirection)
+    async Task<Ply> CalculatePly(Ply parentPly, List<PieceEvaluation> team, int alpha, int beta, int currentPlyDepth, int minimaxDirection)
     {
-        parentPly.futurePlies = new List<Ply>();
+        //parentPly.futurePlies = new List<Ply>();
         currentPlyDepth++;
         if (currentPlyDepth > objectivePlyDepth)
         {
@@ -109,39 +109,46 @@ public class AIController : MonoBehaviour
 
                 List<PieceEvaluation> nextTeam = GetTeam(newPly, minimaxDirection * -1);
                 Task<Ply> calculation = CalculatePly(newPly,
-                    nextTeam,
+                    nextTeam, alpha, beta,
                     currentPlyDepth, minimaxDirection * -1);
                 await calculation;
 
-                parentPly.bestFuture = IsBest(parentPly.bestFuture, minimaxDirection, calculation.Result);
+                parentPly.bestFuture = IsBest(parentPly.bestFuture, minimaxDirection, calculation.Result, ref alpha, ref beta);
                 newPly.originPly = parentPly;
-                parentPly.futurePlies.Add(newPly);
+                //parentPly.futurePlies.Add(newPly);
 
                 PieceMovementState.enPassantFlags = parentPly.enPassantFlags;
                 ResetBoard(newPly);
+                if (beta <= alpha)
+                {
+                    return parentPly.bestFuture;
+                }
             }
         }
         return parentPly.bestFuture;
     }
 
-    Ply IsBest(Ply ply, int minimaxDirection, Ply potentialBest)
+    Ply IsBest(Ply ply, int minimaxDirection, Ply potentialBest, ref int alpha, ref int beta)
     {
+        Ply best = ply;
         if (minimaxDirection == 1)
         {
             if (potentialBest.score > ply.score)
             {
-                return potentialBest;
+                best = potentialBest;
             }
-            return ply;
+            alpha = Mathf.Max(alpha, best.score);
         }
         else
         {
             if (potentialBest.score < ply.score)
             {
-                return potentialBest;
+                best = potentialBest;
             }
-            return ply;
+            beta = Mathf.Min(beta, best.score);
         }
+
+        return best;
     }
 
     Ply CreateSnapShot()
