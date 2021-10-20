@@ -28,14 +28,14 @@ public class AIPlayingState : State
 
     AvailableMoves GetMoveType(Ply ply)
     {
-        List<PieceEvaluation> team;
+        List<Piece> team;
         if (machine.currentlyPlaying == machine.player1)
         {
-            team = ply.golds;
+            team = Board.instance.goldPieces;
         }
         else
         {
-            team = ply.greens;
+            team = Board.instance.greenPieces;
         }
         List<AvailableMoves> moves = Board.instance.selectedPiece.moviment.GetValidMoves();
         foreach (AvailableMoves m in moves)

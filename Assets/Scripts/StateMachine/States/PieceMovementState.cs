@@ -57,12 +57,14 @@ public class PieceMovementState : State
 
         if (piece.tile.content != null)
         {
-            Piece deadPiece = piece.tile.content as Piece;
-            AffectedPiece pieceKilled = new AffectedPiece();
+            Piece deadPiece = piece.tile.content;
+            AffectedEnemy pieceKilled = new AffectedEnemy();
             pieceKilled.piece = deadPiece;
             pieceKilled.to = pieceKilled.from = piece.tile;
             changes.Add(pieceKilled);
             deadPiece.gameObject.SetActive(false);
+            pieceKilled.index = deadPiece.team.IndexOf(deadPiece);
+            deadPiece.team.RemoveAt(pieceKilled.index);
         }
 
         piece.tile.content = piece;
@@ -71,8 +73,6 @@ public class PieceMovementState : State
         if (skipMovements)
         {
             piece.wasMoved = true;
-            //Vector3 vPos = new Vector3(Board.instance.selectedMove.pos.x, Board.instance.selectedMove.pos.y, 0);
-            //piece.transform.position = vPos;
             tcs.SetResult(true);
         }
         else
@@ -146,10 +146,12 @@ public class PieceMovementState : State
             new Vector2Int(0, -1) :
             new Vector2Int(0, 1);
         Tile enemy = Board.instance.tiles[Board.instance.selectedMove.pos + direction];
-        AffectedPiece affectedPieceEnemy = new AffectedPiece();
-        affectedPieceEnemy.from = affectedPieceEnemy.to = enemy;
-        affectedPieceEnemy.piece = enemy.content;
-        changes.Add(affectedPieceEnemy);
+        AffectedEnemy affectedEnemy = new AffectedEnemy();
+        affectedEnemy.from = affectedEnemy.to = enemy;
+        affectedEnemy.piece = enemy.content;
+        affectedEnemy.index = affectedEnemy.piece.team.IndexOf(affectedEnemy.piece);
+        affectedEnemy.piece.team.RemoveAt(affectedEnemy.index);
+        changes.Add(affectedEnemy);
         enemy.content.gameObject.SetActive(false);
         enemy.content = null;
         NormalMove(tcs, skipMovements);
