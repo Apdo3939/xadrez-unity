@@ -25,12 +25,14 @@ public class PawnMoviment : Moviment
     }
     public override List<AvailableMoves> GetValidMoves()
     {
-        List<AvailableMoves> moveable = GetPawnAttack(direction);
-        List<AvailableMoves> moves;
+        List<AvailableMoves> moveable = new List<AvailableMoves>();
+        List<AvailableMoves> moves = new List<AvailableMoves>();
+
+        GetPawnAttack(moveable);
 
         if (!Board.instance.selectedPiece.wasMoved)
         {
-            moves = UntilBlockedPath(direction, false, 2);
+            UntilBlockedPath(moves, direction, false, 2);
             if (moves.Count == 2)
             {
                 moves[1] = new AvailableMoves(moves[1].pos, MoveType.PawnDoubleMove);
@@ -38,7 +40,7 @@ public class PawnMoviment : Moviment
         }
         else
         {
-            moves = UntilBlockedPath(direction, false, 1);
+            UntilBlockedPath(moves, direction, false, 1);
             if (moves.Count > 0)
             {
                 moves[0] = CheckPromotion(moves[0]);
@@ -48,17 +50,14 @@ public class PawnMoviment : Moviment
         moveable.AddRange(moves);
         return moveable;
     }
-    List<AvailableMoves> GetPawnAttack(Vector2Int direction)
+    void GetPawnAttack(List<AvailableMoves> pawnAttack)
     {
-        List<AvailableMoves> pawnAttack = new List<AvailableMoves>();
         Piece piece = Board.instance.selectedPiece;
         Vector2Int leftPos = new Vector2Int(piece.tile.pos.x - 1, piece.tile.pos.y + direction.y);
         Vector2Int rightPos = new Vector2Int(piece.tile.pos.x + 1, piece.tile.pos.y + direction.y);
 
         GetPawnAttack(GetTile(leftPos), pawnAttack);
         GetPawnAttack(GetTile(rightPos), pawnAttack);
-
-        return pawnAttack;
     }
 
     void GetPawnAttack(Tile tile, List<AvailableMoves> pawnAttack)

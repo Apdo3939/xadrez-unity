@@ -20,28 +20,28 @@ public class KingMoviment : Moviment
     {
         List<AvailableMoves> moves = new List<AvailableMoves>();
 
-        moves.AddRange(UntilBlockedPath(new Vector2Int(1, 0), true, 1));
-        moves.AddRange(UntilBlockedPath(new Vector2Int(-1, 0), true, 1));
+        UntilBlockedPath(moves, new Vector2Int(1, 0), true, 1);
+        UntilBlockedPath(moves, new Vector2Int(-1, 0), true, 1);
 
-        moves.AddRange(UntilBlockedPath(new Vector2Int(0, 1), true, 1));
-        moves.AddRange(UntilBlockedPath(new Vector2Int(0, -1), true, 1));
+        UntilBlockedPath(moves, new Vector2Int(0, 1), true, 1);
+        UntilBlockedPath(moves, new Vector2Int(0, -1), true, 1);
 
-        moves.AddRange(UntilBlockedPath(new Vector2Int(1, 1), true, 1));
-        moves.AddRange(UntilBlockedPath(new Vector2Int(-1, -1), true, 1));
+        UntilBlockedPath(moves, new Vector2Int(1, 1), true, 1);
+        UntilBlockedPath(moves, new Vector2Int(-1, -1), true, 1);
 
-        moves.AddRange(UntilBlockedPath(new Vector2Int(-1, 1), true, 1));
-        moves.AddRange(UntilBlockedPath(new Vector2Int(1, -1), true, 1));
+        UntilBlockedPath(moves, new Vector2Int(-1, 1), true, 1);
+        UntilBlockedPath(moves, new Vector2Int(1, -1), true, 1);
 
-        moves.AddRange(Castling());
+        Castling(moves);
         return moves;
     }
 
-    List<AvailableMoves> Castling()
+    void Castling(List<AvailableMoves> moves)
     {
-        List<AvailableMoves> moves = new List<AvailableMoves>();
+
         if (Board.instance.selectedPiece.wasMoved)
         {
-            return moves;
+            return;
         }
         Tile temp = CheckRock(new Vector2Int(1, 0));
         if (temp != null)
@@ -53,7 +53,7 @@ public class KingMoviment : Moviment
         {
             moves.Add(new AvailableMoves(temp.pos, MoveType.Castling));
         }
-        return moves;
+        return;
     }
 
     Tile CheckRock(Vector2Int direction)

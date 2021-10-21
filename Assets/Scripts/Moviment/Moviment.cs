@@ -24,11 +24,12 @@ public abstract class Moviment
         return tile;
     }
 
-    protected List<AvailableMoves> UntilBlockedPath(Vector2Int direction, bool includeBlocked, int limit)
+    protected void UntilBlockedPath(List<AvailableMoves> moves, Vector2Int direction, bool includeBlocked, int limit)
     {
-        List<AvailableMoves> moves = new List<AvailableMoves>();
         Tile current = Board.instance.selectedPiece.tile;
-        while (current != null && moves.Count < limit)
+        int currentCount = moves.Count;
+
+        while (current != null && moves.Count < limit + currentCount)
         {
             if (Board.instance.tiles.TryGetValue(current.pos + direction, out current))
             {
@@ -40,16 +41,16 @@ public abstract class Moviment
                 {
                     if (includeBlocked)
                     {
-                        moves.Add(new AvailableMoves(current.pos));
+                        moves.Insert(0, new AvailableMoves(current.pos));
                     }
-                    return moves;
+                    return;
                 }
                 else
                 {
-                    return moves;
+                    return;
                 }
             }
         }
-        return moves;
+        return;
     }
 }
